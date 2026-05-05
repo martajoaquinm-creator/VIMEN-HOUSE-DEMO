@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vimen House — Asistente IA CRM Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#C9A84C;--gl:#E8C96A;--gd:#8a6820;
+  --d1:#050505;--d2:#0a0a0a;--d3:#111;--d4:#181818;--d5:#202020;--d6:#282828;
+  --bd:rgba(201,168,76,0.18);--bdb:rgba(201,168,76,0.52);
+  --tx:#ede9de;--txm:#8a8070;--txd:#3a3530;
+  --ok:#27ae60;--err:#c0392b;--warn:#d68910;--wa:#25D366;
+}
+html,body{height:100%;background:var(--d1);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+#loader{position:fixed;inset:0;background:var(--d1);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s}
+#loader.out{opacity:0;pointer-events:none}
+.llogo{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--g);letter-spacing:5px;margin-bottom:8px}
+.lsub{font-size:10px;color:var(--txm);letter-spacing:3px;text-transform:uppercase;margin-bottom:36px}
+.lbar{width:220px;height:1px;background:var(--d5);overflow:hidden}
+.lfill{height:100%;background:var(--g);animation:fill 2s ease forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+.shell{display:grid;grid-template-rows:auto 1fr;height:100vh}
+.hdr{background:var(--d2);border-bottom:1px solid var(--bdb);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100}
+.hdr-logo{display:flex;align-items:center;gap:13px}
+.hdr-icon{width:38px;height:38px;background:var(--d4);border:1px solid var(--bdb);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.hdr-name{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--g);letter-spacing:2.5px}
+.hdr-tag{font-size:9px;color:var(--txm);letter-spacing:2.5px;text-transform:uppercase;margin-top:1px}
+.hdr-pills{display:flex;gap:7px}
+.pill{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;border:.5px solid var(--bd);background:rgba(255,255,255,.03);font-size:10px;color:var(--txm)}
+.dot{width:5px;height:5px;border-radius:50%}
+.blink{animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.body{display:grid;grid-template-columns:210px 1fr;height:calc(100vh - 62px)}
+.sidebar{background:var(--d2);border-right:1px solid var(--bd);padding:22px 0;overflow-y:auto;display:flex;flex-direction:column}
+.sb-sec{margin-bottom:26px}
+.sb-lbl{font-size:9px;color:var(--txd);letter-spacing:2.5px;text-transform:uppercase;padding:0 18px;margin-bottom:9px;font-weight:500}
+.sb-btn{width:100%;display:flex;align-items:center;gap:9px;padding:9px 15px;border:none;background:transparent;color:var(--txm);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:left;transition:all .18s;border-left:2px solid transparent}
+.sb-btn:hover{background:rgba(201,168,76,.04);color:var(--tx)}
+.sb-btn.on{background:rgba(201,168,76,.07);color:var(--g);border-left-color:var(--g)}
+.sb-ico{width:27px;height:27px;border-radius:7px;background:var(--d4);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s}
+.sb-btn.on .sb-ico{background:rgba(201,168,76,.14)}
+.sb-num{margin-left:auto;font-size:9px;background:var(--g);color:var(--d1);border-radius:10px;padding:1px 6px;font-weight:500}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px 26px;background:var(--d2);border-bottom:1px solid var(--bd)}
+.hbtn{border-radius:13px;padding:16px 12px 14px;border:1.5px solid;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden;background:transparent}
+.hbtn:hover{transform:translateY(-3px)}
+.hbtn:active{transform:scale(.97)}
+.hb-tag{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:8px;font-weight:500;padding:2px 10px;border-radius:0 0 8px 8px;letter-spacing:.5px}
+.hb-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.hbtn:hover .hb-ico{transform:scale(1.08)}
+.hb-label{font-size:13px;font-weight:500}
+.hb-sub{font-size:9.5px;opacity:.6;text-align:center;line-height:1.5}
+.hb-cnt{font-size:9px;font-weight:500;padding:2px 7px;border-radius:9px;position:absolute;top:9px;right:9px}
+.hbtn-alq{border-color:rgba(201,168,76,.4);color:var(--g)}
+.hbtn-alq .hb-ico{background:rgba(201,168,76,.12)}
+.hbtn-alq .hb-cnt{background:rgba(201,168,76,.12);color:var(--g)}
+.hbtn-alq.on,.hbtn-alq:hover{background:rgba(201,168,76,.06);border-color:var(--g)}
+.hbtn-cmp{border-color:rgba(26,111,168,.4);color:#5aa8d8}
+.hbtn-cmp .hb-ico{background:rgba(26,111,168,.12)}
+.hbtn-cmp .hb-cnt{background:rgba(26,111,168,.12);color:#5aa8d8}
+.hbtn-cmp.on,.hbtn-cmp:hover{background:rgba(26,111,168,.06);border-color:#5aa8d8}
+.hbtn-vnt{border-color:rgba(124,58,138,.55);border-width:2px;color:#c97fe0}
+.hbtn-vnt .hb-ico{background:rgba(124,58,138,.15)}
+.hbtn-vnt .hb-cnt{background:rgba(124,58,138,.14);color:#c97fe0}
+.hbtn-vnt .hb-tag{background:#7c3a8a;color:#f0d0ff}
+.hbtn-vnt.on,.hbtn-vnt:hover{background:rgba(124,58,138,.07);border-color:#c97fe0}
+.hbtn-fil{border-color:rgba(39,174,96,.35);color:#52c97a}
+.hbtn-fil .hb-ico{background:rgba(39,174,96,.12)}
+.hbtn-fil .hb-cnt{background:rgba(39,174,96,.12);color:#52c97a}
+.hbtn-fil.on,.hbtn-fil:hover{background:rgba(39,174,96,.06);border-color:#52c97a}
+.content{overflow-y:auto;background:var(--d1)}
+.ci{padding:26px 30px}
+.panel{display:none}
+.panel.on{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.ptit{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500}
+.psub{font-size:11px;color:var(--txm);margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px}
+.sc{background:var(--d3);border:.5px solid var(--bd);border-radius:10px;padding:13px}
+.sl{font-size:9px;color:var(--txm);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px}
+.sv{font-size:21px;color:var(--g);font-family:'Cormorant Garamond',serif;font-weight:500;line-height:1}
+.sh{font-size:9px;color:var(--txd);margin-top:3px}
+.chatbox{background:var(--d3);border:.5px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.chat-hdr{padding:10px 15px;display:flex;align-items:center;gap:9px;border-bottom:.5px solid var(--bd)}
+.chat-av{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-body{padding:14px;min-height:150px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex}
+.msg.us{justify-content:flex-end}
+.bbl{padding:9px 13px;border-radius:11px;font-size:12.5px;line-height:1.55;max-width:88%;font-family:'DM Sans',sans-serif}
+.msg.ai .bbl{background:var(--d4);color:var(--tx);border:.5px solid var(--bd);border-radius:0 11px 11px 11px}
+.msg.us .bbl{border-radius:11px 0 11px 11px}
+.chat-foot{padding:10px 14px;border-top:.5px solid var(--bd);display:flex;gap:7px}
+.chat-foot input{flex:1;background:var(--d4);border:.5px solid var(--bd);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.chat-foot input:focus{border-color:var(--gd)}
+.send-btn{padding:9px 16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .18s}
+.mic-btn{padding:9px 11px;background:var(--d4);border:.5px solid var(--bd);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mic-btn.rec{background:rgba(192,57,43,.12);border-color:var(--err);animation:pulse .9s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.typing{display:flex;gap:4px;padding:2px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--txm);animation:bop 1.1s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.banner{border-radius:11px;padding:15px 17px;margin-bottom:15px;display:flex;align-items:flex-start;gap:13px}
+.banner-ico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.banner h3{font-size:13px;font-weight:500;margin-bottom:4px}
+.banner p{font-size:11px;line-height:1.6;opacity:.75}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.step{border-radius:10px;padding:12px;text-align:center}
+.step-n{width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;margin:0 auto 7px}
+.step-t{font-size:11px;font-weight:500;margin-bottom:2px}
+.step-s{font-size:9.5px;opacity:.65;line-height:1.4}
+.wa-box{background:rgba(37,211,102,.03);border:.5px solid rgba(37,211,102,.2);border-radius:11px;padding:15px;margin-top:13px}
+.wa-hdr{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.wa-ico{width:34px;height:34px;border-radius:8px;background:rgba(37,211,102,.1);display:flex;align-items:center;justify-content:center}
+.wa-msg{background:var(--d4);border-radius:8px;padding:12px;font-size:12px;color:var(--tx);line-height:1.7;margin-bottom:9px;white-space:pre-line;font-family:'DM Sans',sans-serif}
+.wa-send{width:100%;padding:10px;background:var(--wa);border:none;border-radius:8px;color:var(--d1);font-size:12.5px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .18s}
+.wa-send:hover{background:#1ebe5a}
+.fbox{background:var(--d3);border:.5px solid var(--bd);border-radius:12px;padding:17px;margin-bottom:14px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
+.fi label{font-size:9px;color:var(--txm);letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:4px}
+.finp{width:100%;background:var(--d4);border:.5px solid var(--bd);border-radius:7px;padding:8px 11px;color:var(--tx);font-size:12.5px;font-family:'DM Sans',sans-serif;outline:none}
+.finp:focus{border-color:var(--gd)}
+.fres{border-radius:10px;padding:14px;margin-top:11px}
+.fres.ok{background:rgba(39,174,96,.05);border:.5px solid rgba(39,174,96,.35)}
+.fres.no{background:rgba(192,57,43,.05);border:.5px solid rgba(192,57,43,.35)}
+.frt{font-size:13px;font-weight:500;margin-bottom:9px}
+.frt.ok{color:var(--ok)}.frt.no{color:var(--err)}
+.cr{display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;font-size:12px}
+.ci2{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;margin-top:1px;font-weight:700}
+.cok{background:rgba(39,174,96,.15);color:var(--ok)}
+.cnok{background:rgba(192,57,43,.15);color:var(--err)}
+.cwrn{background:rgba(214,137,16,.15);color:var(--warn)}
+.cal-wrap{background:var(--d3);border:.5px solid var(--bd);border-radius:12px;padding:15px;margin-bottom:14px}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-mon{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--g);font-weight:500}
+.cal-nav{background:var(--d4);border:.5px solid var(--bd);color:var(--txm);border-radius:7px;width:27px;height:27px;cursor:pointer;font-size:14px;transition:all .18s;display:flex;align-items:center;justify-content:center}
+.cal-nav:hover{border-color:var(--g);color:var(--g)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cdh{text-align:center;font-size:9.5px;color:var(--txd);padding:3px;font-weight:500}
+.cday{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--txd);cursor:pointer;border:.5px solid transparent;transition:all .15s;position:relative}
+.cday:hover{background:var(--d4);color:var(--tx)}
+.cday.tod{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.4);color:var(--g);font-weight:500}
+.cday.ev::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--g);position:absolute;bottom:2px}
+.cday.om{color:var(--d6)}
+.ev-list{display:flex;flex-direction:column;gap:7px}
+.ev-item{background:var(--d3);border-left:2px solid var(--g);padding:10px 14px;border-radius:0 9px 9px 0;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:space-between}
+.ev-item:hover{border-left-color:var(--gl);background:var(--d4)}
+.ev-time{font-size:10px;color:var(--g);font-weight:500;margin-bottom:2px}
+.ev-name{font-size:12.5px;color:var(--tx);font-weight:500}
+.ev-type{font-size:10px;color:var(--txm);margin-top:1px}
+.bdg{font-size:9px;padding:2px 7px;border-radius:9px;font-weight:500}
+.b-ok{background:rgba(39,174,96,.1);color:#2ecc71;border:.5px solid rgba(39,174,96,.25)}
+.b-go{background:rgba(201,168,76,.1);color:var(--g);border:.5px solid var(--bd)}
+.b-wn{background:rgba(214,137,16,.1);color:#f0a500;border:.5px solid rgba(214,137,16,.25)}
+.lead-card{background:var(--d3);border:.5px solid var(--bd);border-radius:10px;padding:12px 15px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .18s}
+.lead-card:hover{border-color:var(--bdb);background:var(--d4)}
+.lead-av{width:35px;height:35px;border-radius:50%;background:rgba(201,168,76,.08);border:.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--g);font-weight:500;flex-shrink:0}
+.lead-info{flex:1}
+.lead-n{font-size:12.5px;color:var(--tx);font-weight:500}
+.lead-d{font-size:10px;color:var(--txm);margin-top:1px}
+.lead-bdgs{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.lead-sc{text-align:center;flex-shrink:0;min-width:38px}
+.lead-sv{font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:600}
+.lead-sl{font-size:9px;color:var(--txm)}
+.lead-acts{display:flex;gap:5px;flex-shrink:0}
+.ibt{width:29px;height:29px;border-radius:7px;border:.5px solid var(--bd);background:var(--d4);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--txm);transition:all .18s}
+.ibt:hover{border-color:var(--g);color:var(--g)}
+.ibt.wab{color:var(--wa);border-color:rgba(37,211,102,.3)}
+.ibt.wab:hover{background:rgba(37,211,102,.07)}
+.src-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.src-card{background:var(--d3);border:.5px solid var(--bd);border-radius:9px;padding:11px}
+.src-t{font-size:12px;color:var(--tx);font-weight:500;margin-bottom:3px}
+.src-s{font-size:10px;color:var(--txm);line-height:1.5}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--d2);border:.5px solid var(--bdb);border-radius:14px;padding:22px;width:350px;max-width:92vw}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;margin-bottom:15px}
+.mrow{margin-bottom:10px}
+.mrow label{font-size:9px;color:var(--txm);letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:4px}
+.mrow input,.mrow select{width:100%;background:var(--d3);border:.5px solid var(--bd);border-radius:8px;padding:8px 11px;color:var(--tx);font-size:12.5px;font-family:'DM Sans',sans-serif;outline:none}
+.mrow input:focus,.mrow select:focus{border-color:var(--gd)}
+.mbtns{display:flex;gap:7px;margin-top:14px}
+.gbtn{padding:9px 16px;background:var(--g);color:var(--d1);border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+.gbtn:hover{background:var(--gl)}
+.xbtn{padding:9px 16px;background:transparent;color:var(--g);border:.5px solid var(--bdb);border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--d2);border:.5px solid var(--bdb);border-radius:11px;padding:11px 17px;font-size:12px;color:var(--tx);z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
+.notif{background:var(--d3);border:.5px solid rgba(201,168,76,.35);border-radius:9px;padding:9px 13px;display:flex;align-items:center;gap:9px;margin-top:7px;animation:sin .3s ease}
+@keyframes sin{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.divider{height:.5px;background:var(--bd);margin:14px 0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--d5);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="llogo">VIMEN HOUSE</div>
+  <div class="lsub">Agencia Inmobiliaria · CRM Pro IA</div>
+  <div class="lbar"><div class="lfill"></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-tit" style="color:var(--g)">Nuevo lead</h3>
+    <div class="mrow"><label>Nombre completo</label><input id="m-nom" placeholder="Ej: Ana Martínez López"></div>
+    <div class="mrow"><label>Teléfono</label><input id="m-tel" placeholder="+34 6XX XXX XXX" type="tel"></div>
+    <div class="mrow"><label>Tipo operación</label><select id="m-tipo"><option>Alquiler</option><option>Compra</option><option>Venta</option></select></div>
+    <div class="mrow"><label>Zona / Barrio</label><input id="m-zona" placeholder="Sardinero, Centro..."></div>
+    <div class="mrow"><label>Nómina mensual (€)</label><input id="m-nom2" type="number" placeholder="Mínimo 1.650€"></div>
+    <div class="mrow"><label>Fecha cita</label><input id="m-fecha" type="date"></div>
+    <div class="mrow"><label>Hora</label><input id="m-hora" type="time" value="10:00"></div>
+    <div class="mbtns">
+      <button class="gbtn" style="flex:1" onclick="guardarLead()">Abrir Google Calendar y guardar cita</button>
+      <button class="xbtn" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 2L1 9h2.5v11h15V9H21L11 2z" stroke="#C9A84C" stroke-width="1.1" fill="rgba(201,168,76,0.07)"/>
+        <rect x="8.5" y="12" width="5" height="7" stroke="#C9A84C" stroke-width=".9" fill="rgba(201,168,76,0.08)"/>
+      </svg>
+    </div>
+    <div><div class="hdr-name">VIMEN HOUSE</div><div class="hdr-tag">Agencia Inmobiliaria · CRM Pro IA</div></div>
+  </div>
+  <div class="hdr-pills">
+    <div class="pill"><span class="dot blink" style="background:var(--ok)"></span>IA Activa</div>
+    <div class="pill"><span class="dot blink" style="background:var(--g)"></span>Google Calendar</div>
+    <div class="pill"><span class="dot blink" style="background:var(--wa)"></span>WhatsApp</div>
+    <div class="pill" id="clock" style="color:var(--txd);font-size:9px"></div>
+  </div>
+</header>
+
+<div class="body">
+<nav class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-lbl">Captación</div>
+    <button class="sb-btn on" onclick="sp('alquiler',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1 5v7h3.5V9h4v3H12V5L6.5 1z" stroke="#C9A84C" stroke-width=".9" fill="none"/></svg></div>
+      Alquilar piso<span class="sb-num">14</span>
+    </button>
+    <button class="sb-btn" onclick="sp('compra',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2h9l-1.5 8H3.5L2 2z" stroke="#C9A84C" stroke-width=".9" fill="none"/><circle cx="4.5" cy="11" r=".9" stroke="#C9A84C" stroke-width=".9"/><circle cx="9" cy="11" r=".9" stroke="#C9A84C" stroke-width=".9"/></svg></div>
+      Comprar piso<span class="sb-num">8</span>
+    </button>
+    <button class="sb-btn" onclick="sp('venta',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="#C9A84C" stroke-width="1.1"/></svg></div>
+      Vender piso<span class="sb-num">5</span>
+    </button>
+    <button class="sb-btn" onclick="sp('leads',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="4.5" r="2.5" stroke="#C9A84C" stroke-width=".9"/><path d="M1 12c0-3 2.5-5.5 5.5-5.5S12 9 12 12" stroke="#C9A84C" stroke-width=".9"/></svg></div>
+      Leads diarios<span class="sb-num">23</span>
+    </button>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Herramientas</div>
+    <button class="sb-btn" onclick="sp('filtros',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="#C9A84C" stroke-width="1.1"/></svg></div>
+      Filtros solvencia
+    </button>
+    <button class="sb-btn" onclick="sp('calendar',this)">
+      <div class="sb-ico"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="1" stroke="#C9A84C" stroke-width=".9" fill="none"/><path d="M1 5.5h11M4 1v2.5M9 1v2.5" stroke="#C9A84C" stroke-width=".9"/></svg></div>
+      Google Calendar
+    </button>
+  </div>
+  <div style="padding:0 14px;margin-top:auto;padding-bottom:16px">
+    <div style="background:rgba(201,168,76,.05);border:.5px solid var(--bd);border-radius:9px;padding:12px">
+      <div style="font-size:10px;color:var(--g);font-weight:500;margin-bottom:4px">Demo interactiva v3</div>
+      <div style="font-size:9.5px;color:var(--txm);line-height:1.5">Funciona sin internet · Respuestas IA pregrabadas</div>
+    </div>
+  </div>
+</nav>
+
+<main class="content">
+<div class="hero-grid">
+  <button class="hbtn hbtn-alq on" id="hb-alquiler" onclick="sp('alquiler',null,'alquiler')">
+    <span class="hb-cnt">14</span>
+    <div class="hb-ico"><svg width="21" height="21" viewBox="0 0 21 21" fill="none"><path d="M10.5 2L1 8.5h2v11h15V8.5H20L10.5 2z" stroke="#C9A84C" stroke-width="1.1" fill="rgba(201,168,76,0.1)"/><rect x="8" y="11.5" width="5" height="7" stroke="#C9A84C" stroke-width="1"/></svg></div>
+    <div class="hb-label">Alquilar</div>
+    <div class="hb-sub">Capta clientes<br>que buscan piso</div>
+  </button>
+  <button class="hbtn hbtn-cmp" id="hb-compra" onclick="sp('compra',null,'compra')">
+    <span class="hb-cnt">8</span>
+    <div class="hb-ico"><svg width="21" height="21" viewBox="0 0 21 21" fill="none"><path d="M3 3h15l-2.5 12H5.5L3 3z" stroke="#5aa8d8" stroke-width="1.1" fill="rgba(26,111,168,0.1)"/><circle cx="8" cy="18.5" r="2" stroke="#5aa8d8" stroke-width="1"/><circle cx="14" cy="18.5" r="2" stroke="#5aa8d8" stroke-width="1"/></svg></div>
+    <div class="hb-label" style="color:#5aa8d8">Comprar</div>
+    <div class="hb-sub" style="color:rgba(90,168,216,.65)">Capta compradores<br>con solvencia</div>
+  </button>
+  <button class="hbtn hbtn-vnt" id="hb-venta" onclick="sp('venta',null,'venta')">
+    <span class="hb-tag">★ PRIORITARIO</span>
+    <span class="hb-cnt">5</span>
+    <div class="hb-ico"><svg width="23" height="23" viewBox="0 0 23 23" fill="none"><path d="M11.5 2L2 9h2.5v12h14V9H21L11.5 2z" stroke="#c97fe0" stroke-width="1.2" fill="rgba(124,58,138,0.1)"/><circle cx="15.5" cy="7" r="3.5" stroke="#c97fe0" stroke-width="1" fill="rgba(124,58,138,0.15)"/><path d="M14 7h3M15.5 5.5v3" stroke="#c97fe0" stroke-width="1"/></svg></div>
+    <div class="hb-label" style="color:#c97fe0;font-size:14px">VENDER piso</div>
+    <div class="hb-sub" style="color:rgba(201,127,224,.65)">Capta propietarios<br>+ WhatsApp auto</div>
+  </button>
+  <button class="hbtn hbtn-fil" id="hb-filtros" onclick="sp('filtros',null,'filtros')">
+    <span class="hb-cnt">4</span>
+    <div class="hb-ico"><svg width="21" height="21" viewBox="0 0 21 21" fill="none"><path d="M2 6h17M5 11h11M8 16h5" stroke="#52c97a" stroke-width="1.3"/></svg></div>
+    <div class="hb-label" style="color:#52c97a">Filtro</div>
+    <div class="hb-sub" style="color:rgba(82,201,122,.65)">Evalúa solvencia<br>ASNEF + nómina</div>
+  </button>
+</div>
+
+<div class="ci">
+
+<!-- ALQUILER -->
+<div id="p-alquiler" class="panel on">
+  <div class="ph">
+    <div><div class="ptit" style="color:var(--g)">Captación de alquiler</div><div class="psub">Asistente IA con voz · Califica solvencia · Sincroniza con Google Calendar</div></div>
+    <button class="gbtn" onclick="openModal('alquiler')">+ Nuevo lead</button>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sl">Contactos hoy</div><div class="sv">14</div><div class="sh">+3 vs ayer</div></div>
+    <div class="sc"><div class="sl">Aptos filtro</div><div class="sv">9</div><div class="sh">64% tasa</div></div>
+    <div class="sc"><div class="sl">Citas Calendar</div><div class="sv">4</div><div class="sh">Sync activo ✓</div></div>
+    <div class="sc"><div class="sl">Conversión</div><div class="sv">28%</div><div class="sh">Sector: 18%</div></div>
+  </div>
+  <div class="chatbox">
+    <div class="chat-hdr" style="background:rgba(201,168,76,.04)">
+      <div class="chat-av" style="background:rgba(201,168,76,.12);border:.5px solid var(--bdb)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#C9A84C" stroke-width=".9"/><path d="M4.5 8c.4 1 3.5 1 3.5 0" stroke="#C9A84C" stroke-width=".9"/><circle cx="5" cy="5.8" r=".7" fill="#C9A84C"/><circle cx="8.3" cy="5.8" r=".7" fill="#C9A84C"/></svg>
+      </div>
+      <div>
+        <div style="font-size:12.5px;font-weight:500">Asistente Vimen — Alquiler</div>
+        <div style="font-size:10px;color:var(--txm)">IA conversacional · Voz activada · Califica solvencia automáticamente</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="dot blink" style="background:var(--ok);width:6px;height:6px"></span><span style="font-size:10px;color:var(--ok)">En línea</span></div>
+    </div>
+    <div class="chat-body" id="chat-alquiler">
+      <div class="msg ai"><div class="bbl">¡Hola! Soy el asistente de Vimen House. Estoy aquí para ayudarte a encontrar el piso perfecto en alquiler en Santander. ¿Qué zona y tipo de vivienda buscas?</div></div>
+    </div>
+    <div class="chat-foot">
+      <button class="mic-btn" id="mic-alquiler" onclick="toggleMic('alquiler')" style="color:var(--g)" title="Activar voz">
+        <svg width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="2.5" y=".8" width="5.5" height="7" rx="2.7" stroke="currentColor" stroke-width="1.1" fill="none"/><path d="M.8 7.5c0 2.6 2 4.7 4.7 4.7s4.7-2 4.7-4.7M5.5 12.2v1.3" stroke="currentColor" stroke-width="1.1"/></svg>
+      </button>
+      <input type="text" placeholder="Escribe tu consulta aquí..." id="inp-alquiler" onkeydown="if(event.key==='Enter')sendChat('alquiler')">
+      <button class="send-btn" style="background:var(--g);color:var(--d1)" onclick="sendChat('alquiler')">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPRA -->
+<div id="p-compra" class="panel">
+  <div class="ph">
+    <div><div class="ptit" style="color:#5aa8d8">Asistente de compra de piso</div><div class="psub">Capta compradores · Evalúa capacidad financiera · Filtra solvencia automáticamente</div></div>
+    <button class="gbtn" onclick="openModal('compra')">+ Nuevo comprador</button>
+  </div>
+  <div class="banner" style="background:rgba(26,111,168,.06);border:.5px solid rgba(26,111,168,.25)">
+    <div class="banner-ico" style="background:rgba(26,111,168,.14)">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 3h16l-2.5 12H5.5L3 3z" stroke="#5aa8d8" stroke-width="1.1" fill="rgba(26,111,168,0.1)"/><circle cx="8" cy="19" r="2" stroke="#5aa8d8"/><circle cx="14" cy="19" r="2" stroke="#5aa8d8"/></svg>
+    </div>
+    <div><h3 style="color:#5aa8d8">Asistente IA para compradores</h3><p style="color:var(--txm)">Pregunta presupuesto, hipoteca, zona y califica automáticamente. Filtra ASNEF, contrato indefinido y nómina mínima 1.650€ antes de avanzar.</p></div>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sl">Interesados</div><div class="sv" style="color:#5aa8d8">8</div><div class="sh">Esta semana</div></div>
+    <div class="sc"><div class="sl">Pre-aprobados</div><div class="sv" style="color:#5aa8d8">5</div><div class="sh">63% válidos</div></div>
+    <div class="sc"><div class="sl">Visitas</div><div class="sv" style="color:#5aa8d8">3</div><div class="sh">Próx. 7 días</div></div>
+    <div class="sc"><div class="sl">Ticket medio</div><div class="sv" style="color:#5aa8d8">185k€</div><div class="sh">Estimado</div></div>
+  </div>
+  <div class="chatbox">
+    <div class="chat-hdr" style="background:rgba(26,111,168,.05);border-bottom:.5px solid rgba(26,111,168,.2)">
+      <div class="chat-av" style="background:rgba(26,111,168,.14);border:.5px solid rgba(26,111,168,.4)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#5aa8d8" stroke-width=".9"/><path d="M4.5 8c.4 1 3.5 1 3.5 0" stroke="#5aa8d8" stroke-width=".9"/><circle cx="5" cy="5.8" r=".7" fill="#5aa8d8"/><circle cx="8.3" cy="5.8" r=".7" fill="#5aa8d8"/></svg>
+      </div>
+      <div>
+        <div style="font-size:12.5px;font-weight:500;color:#5aa8d8">Asistente Vimen — Compra</div>
+        <div style="font-size:10px;color:var(--txm)">IA conversacional · Evalúa hipoteca y solvencia financiera</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="dot blink" style="background:var(--ok);width:6px;height:6px"></span><span style="font-size:10px;color:var(--ok)">En línea</span></div>
+    </div>
+    <div class="chat-body" id="chat-compra">
+      <div class="msg ai"><div class="bbl" style="border-color:rgba(26,111,168,.3)">Hola, soy el asistente de compra de Vimen House. Te ayudo a encontrar tu hogar ideal en Santander. ¿Tienes ya un presupuesto en mente y necesitarías financiación bancaria?</div></div>
+    </div>
+    <div class="chat-foot">
+      <button class="mic-btn" id="mic-compra" onclick="toggleMic('compra')" style="color:#5aa8d8"><svg width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="2.5" y=".8" width="5.5" height="7" rx="2.7" stroke="currentColor" stroke-width="1.1" fill="none"/><path d="M.8 7.5c0 2.6 2 4.7 4.7 4.7s4.7-2 4.7-4.7M5.5 12.2v1.3" stroke="currentColor" stroke-width="1.1"/></svg></button>
+      <input type="text" placeholder="Escribe tu consulta..." id="inp-compra" onkeydown="if(event.key==='Enter')sendChat('compra')">
+      <button class="send-btn" style="background:#1a6fa8;color:#fff" onclick="sendChat('compra')">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- VENTA -->
+<div id="p-venta" class="panel">
+  <div class="ph">
+    <div><div class="ptit" style="color:#c97fe0">★ Asistente para VENDER tu piso</div><div class="psub">Capta propietarios · Valoración gratuita · WhatsApp automático al propietario de la agencia</div></div>
+    <button class="gbtn" style="background:#7c3a8a;color:#f0d0ff;border:none" onclick="openModal('venta')">+ Nuevo propietario</button>
+  </div>
+  <div class="banner" style="background:rgba(124,58,138,.07);border:1px solid rgba(124,58,138,.3)">
+    <div class="banner-ico" style="background:rgba(124,58,138,.17)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 9h2.5v13h15V9H22L12 2z" stroke="#c97fe0" stroke-width="1.2" fill="rgba(124,58,138,0.1)"/><circle cx="16" cy="7" r="3.5" stroke="#c97fe0" stroke-width="1" fill="rgba(124,58,138,0.15)"/><path d="M14.5 7h3M16 5.5v3" stroke="#c97fe0" stroke-width="1"/></svg>
+    </div>
+    <div><h3 style="color:#c97fe0">¿Quieres vender tu piso? Nosotros lo vendemos por ti</h3><p style="color:var(--txm)">Valoración gratuita en 24h · Publicación en todos los portales · Sin compromiso. Cada lead genera notificación WhatsApp instantánea al propietario de la agencia.</p></div>
+  </div>
+  <div class="steps">
+    <div class="step" style="background:rgba(124,58,138,.05);border:.5px solid rgba(124,58,138,.25)">
+      <div class="step-n" style="background:rgba(124,58,138,.15);color:#c97fe0">1</div>
+      <div class="step-t" style="color:var(--tx)">Contacto IA</div>
+      <div class="step-s" style="color:var(--txm)">El asistente recoge datos del piso</div>
+    </div>
+    <div class="step" style="background:rgba(124,58,138,.05);border:.5px solid rgba(124,58,138,.25)">
+      <div class="step-n" style="background:rgba(124,58,138,.15);color:#c97fe0">2</div>
+      <div class="step-t" style="color:var(--tx)">WA al dueño</div>
+      <div class="step-s" style="color:var(--txm)">Notificación inmediata al propietario</div>
+    </div>
+    <div class="step" style="background:rgba(124,58,138,.05);border:.5px solid rgba(124,58,138,.25)">
+      <div class="step-n" style="background:rgba(124,58,138,.15);color:#c97fe0">3</div>
+      <div class="step-t" style="color:var(--tx)">Valoración</div>
+      <div class="step-s" style="color:var(--txm)">Cita gratis en 24h por Calendar</div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sl">Propietarios</div><div class="sv" style="color:#c97fe0">5</div><div class="sh">En cartera</div></div>
+    <div class="sc"><div class="sl">Valoraciones</div><div class="sv" style="color:#c97fe0">3</div><div class="sh">Esta semana</div></div>
+    <div class="sc"><div class="sl">Exclusivas</div><div class="sv" style="color:#c97fe0">2</div><div class="sh">Firmadas</div></div>
+    <div class="sc"><div class="sl">Valor medio</div><div class="sv" style="color:#c97fe0">210k€</div><div class="sh">Cartera activa</div></div>
+  </div>
+  <div class="chatbox">
+    <div class="chat-hdr" style="background:rgba(124,58,138,.06);border-bottom:.5px solid rgba(124,58,138,.25)">
+      <div class="chat-av" style="background:rgba(124,58,138,.16);border:.5px solid rgba(124,58,138,.5)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#c97fe0" stroke-width=".9"/><path d="M4.5 8c.4 1 3.5 1 3.5 0" stroke="#c97fe0" stroke-width=".9"/><circle cx="5" cy="5.8" r=".7" fill="#c97fe0"/><circle cx="8.3" cy="5.8" r=".7" fill="#c97fe0"/></svg>
+      </div>
+      <div>
+        <div style="font-size:12.5px;font-weight:500;color:#c97fe0">★ Asistente Vimen — Venta de piso</div>
+        <div style="font-size:10px;color:var(--txm)">IA conversacional · Captación propietarios · WA automático al dueño</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="dot blink" style="background:var(--ok);width:6px;height:6px"></span><span style="font-size:10px;color:var(--ok)">En línea</span></div>
+    </div>
+    <div class="chat-body" id="chat-venta">
+      <div class="msg ai"><div class="bbl" style="border-color:rgba(124,58,138,.3)">¡Hola! En Vimen House vendemos tu piso al mejor precio. Hacemos una valoración gratuita sin compromiso. ¿Tienes una propiedad en Santander que quieras vender o conocer su valor actual?</div></div>
+    </div>
+    <div class="chat-foot">
+      <button class="mic-btn" id="mic-venta" onclick="toggleMic('venta')" style="color:#c97fe0"><svg width="11" height="13" viewBox="0 0 11 13" fill="none"><rect x="2.5" y=".8" width="5.5" height="7" rx="2.7" stroke="currentColor" stroke-width="1.1" fill="none"/><path d="M.8 7.5c0 2.6 2 4.7 4.7 4.7s4.7-2 4.7-4.7M5.5 12.2v1.3" stroke="currentColor" stroke-width="1.1"/></svg></button>
+      <input type="text" placeholder="Cuéntame sobre tu propiedad..." id="inp-venta" onkeydown="if(event.key==='Enter')sendChat('venta')">
+      <button class="send-btn" style="background:#7c3a8a;color:#f0d0ff" onclick="sendChat('venta')">Enviar</button>
+    </div>
+  </div>
+  <div class="wa-box" id="wabox">
+    <div class="wa-hdr">
+      <div class="wa-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L0 24l6.335-1.512A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.814 9.814 0 01-5.001-1.366l-.358-.213-3.761.897.933-3.663-.234-.375A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg></div>
+      <div>
+        <div style="font-size:12.5px;color:var(--wa);font-weight:500">Notificación automática al propietario de la agencia</div>
+        <div style="font-size:10px;color:var(--txm)">Se genera con cada lead de venta captado · Llega a tu WhatsApp</div>
+      </div>
+    </div>
+    <div class="wa-msg" id="wa-msg">🏠 *VIMEN HOUSE* — Nuevo propietario captado
+
+👤 Lead activo via asistente IA
+📍 Zona: Santander
+💬 Interesado en valoración gratuita
+
+📅 Solicita cita de valoración
+_Responde para gestionar este lead_</div>
+    <button class="wa-send" onclick="enviarWA()">Enviar notificación WhatsApp al propietario</button>
+    <div id="wa-notifs"></div>
+  </div>
+</div>
+
+<!-- LEADS -->
+<div id="p-leads" class="panel">
+  <div class="ph">
+    <div><div class="ptit" style="color:var(--g)">Programa de leads diarios</div><div class="psub">Campaña activa · Filtrado automático · Score de solvencia en tiempo real</div></div>
+    <div style="display:flex;gap:7px">
+      <button class="xbtn" onclick="exportCSV()">Exportar CSV</button>
+      <button class="gbtn" onclick="openModal('leads')">+ Nuevo lead</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="sc"><div class="sl">Leads hoy</div><div class="sv">23</div><div class="sh">Meta: 20 ✓</div></div>
+    <div class="sc"><div class="sl">Aptos</div><div class="sv">15</div><div class="sh">65% filtro OK</div></div>
+    <div class="sc"><div class="sl">Contactados</div><div class="sv">11</div><div class="sh">WA + llamada</div></div>
+    <div class="sc"><div class="sl">CPL medio</div><div class="sv">4,20€</div><div class="sh">Meta: 5€ ✓</div></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:11px;color:var(--txm)">Leads — 5 mayo 2026</div>
+    <select id="filtro-tipo" onchange="filtrarLeads()" style="background:var(--d3);border:.5px solid var(--bd);color:var(--txm);font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 9px;border-radius:7px;outline:none">
+      <option>Todos</option><option>Alquiler</option><option>Compra</option><option>Venta</option>
+    </select>
+  </div>
+  <div id="leads-list"></div>
+  <div class="divider"></div>
+  <div style="font-size:11px;color:var(--g);font-weight:500;margin-bottom:9px">Dónde comprar leads de calidad</div>
+  <div class="src-grid">
+    <div class="src-card"><div class="src-t">Meta Ads (Facebook/IG)</div><div class="src-s">Leads 2–5€ · Segmentación por zona en Santander · Formulario instantáneo</div></div>
+    <div class="src-card"><div class="src-t">Google Ads</div><div class="src-s">Intención alta · 5–15€/lead · Ideal para compradores activos</div></div>
+    <div class="src-card"><div class="src-t">Idealista / Fotocasa Pro</div><div class="src-s">Leads propietarios · Suscripción desde 120€/mes · Muy cualificados</div></div>
+    <div class="src-card"><div class="src-t">Witei / Inmovilla CRM</div><div class="src-s">CRM + leads integrados · Planes desde 49€/mes · Especializado inmobiliaria</div></div>
+  </div>
+</div>
+
+<!-- FILTROS -->
+<div id="p-filtros" class="panel">
+  <div class="ph">
+    <div><div class="ptit" style="color:#52c97a">Filtro de solvencia</div><div class="psub">Evalúa los 4 criterios mínimos de Vimen House antes de avanzar con cualquier cliente</div></div>
+  </div>
+  <div class="fbox">
+    <div style="font-size:12px;color:#52c97a;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="#52c97a" stroke-width="1.1"/></svg>
+      Datos del cliente a evaluar
+    </div>
+    <div class="fgrid">
+      <div class="fi"><label>Nombre completo</label><input class="finp" id="fn" placeholder="Juan Pérez García"></div>
+      <div class="fi"><label>Nómina mensual neta (€)</label><input class="finp" type="number" id="fnom" placeholder="Mínimo 1.650€"></div>
+      <div class="fi"><label>Tipo de contrato</label>
+        <select class="finp" id="fcon">
+          <option value="">Seleccionar...</option>
+          <option value="indefinido">Indefinido</option>
+          <option value="temporal">Temporal</option>
+          <option value="autonomo">Autónomo</option>
+          <option value="practicas">Prácticas / Beca</option>
+        </select>
+      </div>
+      <div class="fi"><label>Antigüedad laboral (años)</label><input class="finp" type="number" id="fant" placeholder="Mínimo 1 año" step="0.5"></div>
+    </div>
+    <div style="margin-bottom:11px">
+      <div style="font-size:9px;color:var(--txm);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px">Estado ASNEF</div>
+      <div style="display:flex;gap:16px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;color:var(--tx)"><input type="radio" name="asnef" value="libre" style="accent-color:#52c97a"> Libre de ASNEF</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;color:var(--tx)"><input type="radio" name="asnef" value="fichero" style="accent-color:#52c97a"> En fichero ASNEF</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;color:var(--tx)"><input type="radio" name="asnef" value="pendiente" style="accent-color:#52c97a"> Pendiente verificar</label>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="gbtn" style="flex:1;background:#27ae60;color:#fff" onclick="evalFiltro()">Evaluar solvencia ahora</button>
+      <button class="xbtn" style="color:#52c97a;border-color:rgba(82,201,122,.4)" onclick="limpFiltro()">Limpiar</button>
+    </div>
+  </div>
+  <div id="fres"></div>
+  <div class="divider"></div>
+  <div style="font-size:9px;color:var(--txm);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Criterios obligatorios Vimen House</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div style="background:var(--d3);border:.5px solid var(--bd);border-radius:9px;padding:11px;display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0"></div><div><div style="font-size:11.5px;color:var(--tx);font-weight:500">Sin ASNEF</div><div style="font-size:9.5px;color:var(--txm)">Obligatorio · Sin excepciones</div></div></div>
+    <div style="background:var(--d3);border:.5px solid var(--bd);border-radius:9px;padding:11px;display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0"></div><div><div style="font-size:11.5px;color:var(--tx);font-weight:500">Contrato indefinido</div><div style="font-size:9.5px;color:var(--txm)">Obligatorio</div></div></div>
+    <div style="background:var(--d3);border:.5px solid var(--bd);border-radius:9px;padding:11px;display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0"></div><div><div style="font-size:11.5px;color:var(--tx);font-weight:500">Antigüedad mín. 1 año</div><div style="font-size:9.5px;color:var(--txm)">Obligatorio</div></div></div>
+    <div style="background:var(--d3);border:.5px solid var(--bd);border-radius:9px;padding:11px;display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0"></div><div><div style="font-size:11.5px;color:var(--tx);font-weight:500">Nómina mín. 1.650€</div><div style="font-size:9.5px;color:var(--txm)">Neta mensual</div></div></div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="p-calendar" class="panel">
+  <div class="ph">
+    <div><div class="ptit" style="color:var(--g)">Google Calendar</div><div class="psub">Citas sincronizadas · 3 eventos Vimen House activos en tu calendar real</div></div>
+    <button class="gbtn" onclick="openModal('cita')">+ Agendar cita</button>
+  </div>
+  <div class="cal-wrap">
+    <div class="cal-hdr">
+      <button class="cal-nav" onclick="prevM()">&#8249;</button>
+      <div class="cal-mon" id="cal-mon">Mayo 2026</div>
+      <button class="cal-nav" onclick="nextM()">&#8250;</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div style="font-size:9px;color:var(--txm);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Próximas citas Vimen House</div>
+  <div class="ev-list">
+    <div class="ev-item" onclick="showToast('Abriendo evento en Google Calendar...',2000)">
+      <div><div class="ev-time">Mié 6 mayo · 10:00–11:00</div><div class="ev-name">🏠 Visita alquiler Sardinero · María García</div><div class="ev-type">Alquiler · 2 hab · Score 98/100 · Creado en Calendar ✓</div></div>
+      <span class="bdg b-ok">Confirmada</span>
+    </div>
+    <div class="ev-item" onclick="showToast('Abriendo evento en Google Calendar...',2000)">
+      <div><div class="ev-time">Jue 7 mayo · 11:30–12:30</div><div class="ev-name">🏡 Valoración propietario · C/ Atarazanas 14</div><div class="ev-type">Venta · Estimado 210.000€ · Creado en Calendar ✓</div></div>
+      <span class="bdg b-go">Pendiente</span>
+    </div>
+    <div class="ev-item" onclick="showToast('Abriendo evento en Google Calendar...',2000)">
+      <div><div class="ev-time">Vie 8 mayo · 16:00–17:00</div><div class="ev-name">🔑 Visita compra Centro · Javier López</div><div class="ev-type">Compra · Presupuesto 185.000€ · Creado en Calendar ✓</div></div>
+      <span class="bdg b-wn">Por confirmar</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</main>
+</div>
+</div>
+
+<script>
+window.addEventListener('load',function(){
+  setTimeout(function(){document.getElementById('loader').classList.add('out');},2100);
+});
+
+function tick(){
+  var d=new Date();
+  var el=document.getElementById('clock');
+  if(el) el.textContent=d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})+' · '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+}
+tick(); setInterval(tick,1000);
+
+function showToast(msg,dur){
+  dur=dur||2800;
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},dur);
+}
+
+function sp(id,btn,hbId){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.sb-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.hbtn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('p-'+id).classList.add('on');
+  if(btn) btn.classList.add('on');
+  var hid=hbId||id;
+  var hb=document.getElementById('hb-'+hid);
+  if(hb) hb.classList.add('on');
+  document.querySelectorAll('.sb-btn').forEach(function(b){
+    var oc=b.getAttribute('onclick')||'';
+    if(oc.indexOf("'"+id+"'")>-1) b.classList.add('on');
+  });
+}
+
+var RESP={
+  alquiler:[
+    "Perfecto. ¿Cuántas habitaciones necesitas y cuál es tu presupuesto máximo mensual para el alquiler?",
+    "Entendido. Para acceder a nuestras mejores opciones verifico tu perfil. ¿Tienes contrato laboral indefinido actualmente?",
+    "Muy bien. ¿Podrías indicarme tu nómina mensual neta? Nuestros pisos requieren un mínimo de 1.650€ para garantizar estabilidad.",
+    "Con ese perfil eres candidato ideal. ¿Cuándo necesitas entrar? Te busco las mejores opciones disponibles en esa zona.",
+    "Tenemos varias opciones que encajan perfectamente. ¿Qué día te viene mejor para una visita, esta semana o la próxima?",
+    "Perfecto, quedamos confirmados. Recibirás un recordatorio por WhatsApp. ¿Alguna pregunta más sobre la zona o el piso?"
+  ],
+  compra:[
+    "Entendido. ¿Necesitarías financiación bancaria o dispones del importe completo? Esto nos ayuda a buscar las mejores opciones.",
+    "Para tramitar la hipoteca necesito verificar tu solvencia. ¿Tienes contrato indefinido y llevas más de un año en tu empresa actual?",
+    "¿Cuál es tu nómina mensual neta? Con 1.650€ o más podemos acceder a las mejores condiciones hipotecarias en Santander.",
+    "Excelente perfil financiero. ¿Tienes preferencia por alguna zona: centro histórico, Sardinero, Cuatro Caminos o periferia?",
+    "Tenemos varias propiedades en ese rango en esa zona. ¿Prefieres piso en altura o también considerarías planta baja o dúplex?",
+    "Perfecto. Te preparo una selección personalizada y agendo visitas para esta semana. ¿Cuándo tienes disponibilidad?"
+  ],
+  venta:[
+    "Genial, hacemos valoraciones gratuitas en menos de 24 horas. ¿Podrías indicarme la dirección aproximada y los metros cuadrados?",
+    "Perfecto. ¿Cuántas habitaciones tiene y en qué estado se encuentra? ¿Ha sido reformado recientemente o está en su estado original?",
+    "¿Tienes algún precio en mente o prefieres que hagamos nosotros la valoración de mercado sin ningún compromiso?",
+    "Muy interesante. La zona tiene muy buena demanda ahora mismo. Nuestro equipo puede visitarlo esta semana para la valoración.",
+    "Le notifico al propietario de Vimen House ahora mismo. Recibirá todos tus datos por WhatsApp en este momento. ✓",
+    "Cita confirmada. En Vimen House nos encargamos de todo: fotos profesionales, publicación en portales y gestión de visitas."
+  ]
+};
+var counters={alquiler:0,compra:0,venta:0};
+
+function addMsg(tipo,role,txt){
+  var c=document.getElementById('chat-'+tipo);
+  var d=document.createElement('div'); d.className='msg '+role;
+  var bg=role==='us'?(tipo==='compra'?'background:rgba(26,111,168,0.15)':tipo==='venta'?'background:rgba(124,58,138,0.15)':'background:rgba(201,168,76,0.1)'):'';
+  d.innerHTML='<div class="bbl" style="'+bg+'">'+txt+'</div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight; return d;
+}
+
+function buildWAMsg(txt){
+  var preview = txt.length > 50 ? txt.substring(0,50)+'...' : txt;
+  return '\uD83C\uDFE0 VIMEN HOUSE - Nuevo propietario captado\n\n'
+       + '\uD83D\uDC64 Lead activo via asistente IA\n'
+       + '\uD83D\uDCAC "' + preview + '"\n'
+       + '\uD83D\uDCCD Santander\n\n'
+       + '\uD83D\uDCC5 Solicita valoracion gratuita\n'
+       + '_Responde para gestionar este lead_';
+}
+function sendChat(tipo){
+  var inp=document.getElementById('inp-'+tipo);
+  var txt=inp.value.trim(); if(!txt) return;
+  inp.value='';
+  addMsg(tipo,'us',txt);
+  if(tipo==='venta'){
+    var wm=document.getElementById('wa-msg');
+    if(wm){wm.textContent=buildWAMsg(txt);}
+  }
+  var chat=document.getElementById('chat-'+tipo);
+  var tm=document.createElement('div'); tm.className='msg ai';
+  tm.innerHTML='<div class="bbl"><div class="typing"><span></span><span></span><span></span></div></div>';
+  chat.appendChild(tm); chat.scrollTop=chat.scrollHeight;
+  var resps=RESP[tipo]||RESP.alquiler;
+  var reply=resps[counters[tipo]%resps.length];
+  counters[tipo]++;
+  setTimeout(function(){
+    tm.remove();
+    addMsg(tipo,'ai',reply);
+    if(tipo==='venta'&&counters[tipo]>=3) showToast('★ Lead captado · WhatsApp listo para enviar al propietario',3500);
+  }, 900+Math.random()*600);
+}
+
+var mics={};
+function toggleMic(tipo){
+  var btn=document.getElementById('mic-'+tipo);
+  if(mics[tipo]){btn.classList.remove('rec');mics[tipo]=false;showToast('Micrófono desactivado');return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('Voz disponible en Chrome, Edge y Safari');return;}
+  var r=new SR(); r.lang='es-ES'; r.continuous=false;
+  r.onresult=function(e){
+    var t=e.results[0][0].transcript;
+    document.getElementById('inp-'+tipo).value=t;
+    btn.classList.remove('rec'); mics[tipo]=false;
+    showToast('Capturado: "'+t.substring(0,40)+(t.length>40?'...':'"'));
+  };
+  r.onerror=r.onend=function(){btn.classList.remove('rec');mics[tipo]=false;};
+  r.start(); btn.classList.add('rec'); mics[tipo]=true;
+  showToast('Escuchando... habla ahora en español');
+}
+
+function enviarWA(){
+  showToast('✓ Mensaje enviado al propietario por WhatsApp',3000);
+  var h=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  var n=document.createElement('div'); n.className='notif';
+  n.innerHTML='<span class="dot" style="background:var(--wa);width:8px;height:8px;flex-shrink:0"></span><div><div style="font-size:12px;color:var(--tx);font-weight:500">WhatsApp enviado · '+h+'</div><div style="font-size:10px;color:var(--txm)">Lead de venta notificado al propietario ✓</div></div>';
+  document.getElementById('wa-notifs').prepend(n);
+  setTimeout(function(){n.remove();},6000);
+}
+
+function evalFiltro(){
+  var nom=document.getElementById('fn').value.trim();
+  var nomina=parseFloat(document.getElementById('fnom').value);
+  var con=document.getElementById('fcon').value;
+  var ant=parseFloat(document.getElementById('fant').value);
+  var asnef=document.querySelector('input[name="asnef"]:checked');
+  var res=document.getElementById('fres');
+  if(!nom||isNaN(nomina)||!con||isNaN(ant)||!asnef){
+    res.className='fres no';
+    res.innerHTML='<div class="frt no">Completa todos los campos para evaluar</div>'; return;
+  }
+  var C=[
+    {ok:asnef.value==='libre',ci:asnef.value==='libre'?'cok':'cnok',tx:'ASNEF',sub:asnef.value==='libre'?'Libre de ficheros de morosidad':'Figura en ASNEF — no apto'},
+    {ok:con==='indefinido',ci:con==='indefinido'?'cok':'cnok',tx:'Contrato indefinido',sub:con==='indefinido'?'Tipo de contrato válido':'Requiere contrato indefinido'},
+    {ok:ant>=1,ci:ant>=1?'cok':ant>=0.5?'cwrn':'cnok',tx:'Antigüedad '+ant+' años',sub:ant>=1?'Cumple el mínimo de 1 año':'No cumple el mínimo de 1 año'},
+    {ok:nomina>=1650,ci:nomina>=1650?'cok':nomina>=1400?'cwrn':'cnok',tx:'Nómina '+nomina.toLocaleString('es-ES')+'€',sub:nomina>=1650?'Supera el mínimo de 1.650€':'No alcanza el mínimo de 1.650€'}
+  ];
+  var all=C.every(function(c){return c.ok;});
+  var sc=Math.round(C.filter(function(c){return c.ok;}).length/4*100);
+  res.className='fres '+(all?'ok':'no');
+  res.innerHTML='<div class="frt '+(all?'ok':'no')+'">'+(all?'✓ CLIENTE APTO — Pasa todos los filtros · Score '+sc+'/100':'✗ CLIENTE NO APTO — No cumple todos los requisitos · Score '+sc+'/100')+'</div>'+
+    C.map(function(c){return '<div class="cr"><div class="ci2 '+c.ci+'">'+(c.ci==='cok'?'✓':c.ci==='cwrn'?'!':'✗')+'</div><div><div style="color:var(--tx)">'+c.tx+'</div><div style="color:var(--txm);font-size:10px">'+c.sub+'</div></div></div>';}).join('');
+  showToast(all?'✓ Cliente APTO · Procede con el proceso':'✗ No cumple los requisitos mínimos');
+}
+
+function limpFiltro(){
+  ['fn','fnom','fant'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('fcon').value='';
+  document.querySelectorAll('input[name="asnef"]').forEach(function(r){r.checked=false;});
+  var r=document.getElementById('fres'); r.className=''; r.innerHTML='';
+}
+
+var LEADS=[
+  {ini:'MG',nom:'María García Ruiz',det:'Alquiler · Sardinero · 2 hab',bdgs:[{t:'ASNEF libre',ok:true},{t:'Indefinido',ok:true},{t:'2.100€',ok:true},{t:'3 años',ok:true}],sc:98,tipo:'Alquiler'},
+  {ini:'JL',nom:'Javier López Martín',det:'Compra · Centro · 3 hab',bdgs:[{t:'ASNEF libre',ok:true},{t:'Indefinido',ok:true},{t:'1.780€',ok:null},{t:'2 años',ok:true}],sc:82,tipo:'Compra'},
+  {ini:'SR',nom:'Sara Rodríguez Pérez',det:'Venta · Reina Victoria · 4 hab',bdgs:[{t:'ASNEF pendiente',ok:false},{t:'Indefinido',ok:true},{t:'2.400€',ok:true}],sc:41,tipo:'Venta'},
+  {ini:'AM',nom:'Antonio Merino Gil',det:'Alquiler · Cuatro Caminos · 1 hab',bdgs:[{t:'ASNEF libre',ok:true},{t:'Indefinido',ok:true},{t:'1.900€',ok:true},{t:'4 años',ok:true}],sc:95,tipo:'Alquiler'},
+  {ini:'LF',nom:'Laura Fernández Ruiz',det:'Compra · Maliaño · chalet',bdgs:[{t:'ASNEF libre',ok:true},{t:'Temporal',ok:false},{t:'2.200€',ok:true}],sc:38,tipo:'Compra'}
+];
+
+function bdgStyle(ok){
+  if(ok===true) return 'font-size:9px;padding:2px 6px;border-radius:9px;font-weight:500;background:rgba(39,174,96,.1);color:#2ecc71;border:.5px solid rgba(39,174,96,.25)';
+  if(ok===false) return 'font-size:9px;padding:2px 6px;border-radius:9px;font-weight:500;background:rgba(192,57,43,.1);color:#e74c3c;border:.5px solid rgba(192,57,43,.25)';
+  return 'font-size:9px;padding:2px 6px;border-radius:9px;font-weight:500;background:rgba(214,137,16,.1);color:#f0a500;border:.5px solid rgba(214,137,16,.25)';
+}
+
+function renderLeads(data){
+  var list=document.getElementById('leads-list'); if(!list) return;
+  list.innerHTML=data.map(function(l){
+    return '<div class="lead-card">'+
+      '<div class="lead-av">'+l.ini+'</div>'+
+      '<div class="lead-info">'+
+        '<div class="lead-n">'+l.nom+'</div>'+
+        '<div class="lead-d">'+l.det+'</div>'+
+        '<div class="lead-bdgs">'+l.bdgs.map(function(b){return '<span style="'+bdgStyle(b.ok)+'">'+b.t+'</span>';}).join('')+'</div>'+
+      '</div>'+
+      '<div class="lead-sc"><div class="lead-sv" style="color:'+(l.sc>=70?'var(--g)':l.sc>=50?'var(--warn)':'var(--err)')+'">'+l.sc+'</div><div class="lead-sl">score</div></div>'+
+      '<div class="lead-acts">'+
+        '<div class="ibt wab" onclick="showToast(\'WhatsApp enviado sobre: '+l.nom+'\',2500)" title="WhatsApp"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg></div>'+
+        '<div class="ibt" onclick="showToast(\'Llamando a: '+l.nom+'\',2000)" title="Llamar"><svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M2.5 1l2.2 2.7-1.3 1.4c.7 1.4 2.3 3 3.7 3.7l1.4-1.3L11.1 9.7l-.9 1.8C7 13 .5 6.5 2.5 1z" stroke="currentColor" stroke-width=".9"/></svg></div>'+
+        '<div class="ibt" onclick="showToast(\'Cita agendada para: '+l.nom+' ✓\',2500)" title="Agendar"><svg width="12" height="12" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="1" stroke="currentColor" stroke-width=".9" fill="none"/><path d="M1 5.5h11M4 1v2.5M9 1v2.5" stroke="currentColor" stroke-width=".9"/></svg></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function filtrarLeads(){
+  var tipo=document.getElementById('filtro-tipo').value;
+  renderLeads(tipo==='Todos'?LEADS:LEADS.filter(function(l){return l.tipo===tipo;}));
+}
+
+function exportCSV(){
+  var csv='Nombre,Tipo,Score\n'+LEADS.map(function(l){return l.nom+','+l.tipo+','+l.sc;}).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='leads_vimen_house.csv'; a.click();
+  showToast('✓ CSV exportado correctamente');
+}
+
+renderLeads(LEADS);
+
+var MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var cy=2026,cm=4;
+var EVD=[6,7,8,10,14,15,19];
+
+function renderCal(){
+  document.getElementById('cal-mon').textContent=MN[cm]+' '+cy;
+  var g=document.getElementById('cal-grid');
+  var dias=['L','M','X','J','V','S','D'];
+  var h=dias.map(function(d){return '<div class="cdh">'+d+'</div>';}).join('');
+  var f=new Date(cy,cm,1).getDay(); var off=f===0?6:f-1;
+  var dim=new Date(cy,cm+1,0).getDate(); var prev=new Date(cy,cm,0).getDate();
+  for(var i=0;i<off;i++) h+='<div class="cday om">'+(prev-off+1+i)+'</div>';
+  for(var dd=1;dd<=dim;dd++){
+    var tod=dd===5&&cm===4&&cy===2026;
+    var ev=EVD.indexOf(dd)>-1&&cm===4;
+    h+='<div class="cday'+(tod?' tod':'')+(ev?' ev':'')+'">'+dd+'</div>';
+  }
+  g.innerHTML=h;
+}
+function prevM(){cm--;if(cm<0){cm=11;cy--;}renderCal();}
+function nextM(){cm++;if(cm>11){cm=0;cy++;}renderCal();}
+renderCal();
+
+var mTipo='';
+function openModal(tipo){
+  mTipo=tipo;
+  var lbls={alquiler:'Nuevo lead — Alquiler',compra:'Nuevo comprador — Compra',venta:'Nuevo propietario — Venta',leads:'Nuevo lead',cita:'Agendar cita'};
+  document.getElementById('modal-tit').textContent=lbls[tipo]||'Nuevo lead';
+  document.getElementById('modal-tit').style.color=tipo==='venta'?'#c97fe0':tipo==='compra'?'#5aa8d8':'var(--g)';
+  var today=new Date(); today.setDate(today.getDate()+1);
+  document.getElementById('m-fecha').value=today.toISOString().slice(0,10);
+  if(tipo==='venta') document.getElementById('m-tipo').value='Venta';
+  else if(tipo==='compra') document.getElementById('m-tipo').value='Compra';
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+function guardarLead(){
+  var nom=document.getElementById('m-nom').value.trim();
+  var fecha=document.getElementById('m-fecha').value;
+  var tipo=document.getElementById('m-tipo').value;
+  var zona=document.getElementById('m-zona').value.trim()||'Santander';
+  var hora=document.getElementById('m-hora').value||'10:00';
+  var nom2=document.getElementById('m-nom2').value||'';
+  if(!nom||!fecha){showToast('Completa nombre y fecha para continuar');return;}
+  closeModal();
+
+  // Build Google Calendar URL with prefilled data
+  var emojis={Alquiler:'🏠',Compra:'🔑',Venta:'🏡'};
+  var titulo=encodeURIComponent((emojis[tipo]||'🏠')+' Vimen House — '+tipo+' · '+nom+' · '+zona);
+  var desc=encodeURIComponent('Cliente: '+nom+'\nZona: '+zona+', Santander\nTipo: '+tipo+(nom2?'\nNómina: '+nom2+'€':'')+'\n\nLead captado via asistente IA Vimen House');
+  var loc=encodeURIComponent(zona+', Santander');
+
+  // Format dates for Google Calendar (YYYYMMDDTHHmmss)
+  var d=fecha.replace(/-/g,'');
+  var hparts=hora.split(':');
+  var hStart=hparts[0]+hparts[1]+'00';
+  var hEndNum=parseInt(hparts[0])+1;
+  var hEnd=(hEndNum<10?'0':'')+hEndNum+hparts[1]+'00';
+  var startDT=d+'T'+hStart;
+  var endDT=d+'T'+hEnd;
+
+  var calUrl='https://calendar.google.com/calendar/render?action=TEMPLATE'+
+    '&text='+titulo+
+    '&dates='+startDT+'/'+endDT+
+    '&details='+desc+
+    '&location='+loc;
+
+  // Open Google Calendar
+  window.open(calUrl,'_blank');
+  showToast('✓ Abriendo Google Calendar con la cita prellenada — solo pulsa Guardar',4000);
+
+  // Update WA if venta
+  if(mTipo==='venta'){
+    setTimeout(function(){
+      var wm=document.getElementById('wa-msg');
+      if(wm) wm.textContent='🏠 *VIMEN HOUSE* — Nuevo propietario\n\n👤 '+nom+'\n📍 Zona: '+zona+', Santander\n📅 Cita: '+fecha+' a las '+hora+'h\n\n_Captado via asistente IA Vimen House_';
+      showToast('★ WA actualizado con datos del propietario',2500);
+    },1200);
+  }
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+</script>
+</body>
+</html>
